@@ -1,10 +1,8 @@
 use clap::Parser;
 
-// Model programs around the data they handle; struct
-// A struct is like an object’s data attributes (in OOP).
-
-
 // Search for a pattern in a fle and display the lines that contain it
+//
+// Model programs around the data they handle; struct like an object’s data attributes (in OOP).
 #[derive(Parser)]
 struct Cli {
     // The pattern to look for
@@ -15,5 +13,12 @@ struct Cli {
 }
 
 fn main() {
-    let _args = Cli::parse();
+    let args = Cli::parse();
+    let content = std::fs::read_to_string(&args.path).expect("Could not read file");
+
+    for line in content.lines() {
+        if line.contains(&args.pattern) {
+            println!("{}", line)
+        }
+    }
 }
