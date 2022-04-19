@@ -22,6 +22,7 @@ fn main() -> io::Result<()> {
 
     for line in reader.lines() {
         // Extract the line, or handle the error.
+        // Since line is a Result, we can use match to check which variant it is
         match line {
             Ok(line) => {
                 if line.trim().contains(&args.pattern) {
