@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::{self, prelude::*, BufReader};
+
 use clap::Parser;
 
 // Search for a pattern in a fle and display the lines that contain it
@@ -12,13 +15,22 @@ struct Cli {
     path: std::path::PathBuf, // PathBuff is like a String but for file system path that work cross platform
 }
 
-fn main() {
+fn main() -> io::Result<()> {
     let args = Cli::parse();
-    let content = std::fs::read_to_string(&args.path).expect("Could not read file");
+    let f = File::open(&args.path)?;
+    let reader = BufReader::new(f);
 
-    for line in content.lines() {
-        if line.contains(&args.pattern) {
-            println!("{}", line)
-        }
+    for line in reader.lines() {
+        // Extract the line, or handle the error.
+        match line {
+            Ok(line) => {
+                if line.trim().contains(&args.pattern) {
+                    println!("{}", line)
+                }
+            }
+            Err(err) => panic!("failed to reader line {}", err),
+        };
     }
+
+    Ok(())
 }
