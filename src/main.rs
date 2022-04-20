@@ -2,6 +2,7 @@ use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
 use clap::Parser;
+use anyhow::{Context, Result};
 
 // Search for a pattern in a fle and display the lines that contain it
 //
@@ -15,13 +16,10 @@ struct Cli {
     path: std::path::PathBuf, // PathBuff is like a String but for file system path that work cross platform
 }
 
-#[derive(Debug)]
-struct CustomError (String);
-
-fn main() -> Result<(), CustomError> {
+fn main() -> Result<()> {
     let args = Cli::parse();
     let f = File::open(&args.path)
-        .map_err(|err| CustomError(format!("Error reading `{:?}`: {}", &args.path, err)))?;
+        .with_context(|| format!("Error reading `{:?}`", &args.path))?;
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
