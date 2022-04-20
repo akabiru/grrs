@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, prelude::*, BufReader};
+use std::io::{prelude::*, BufReader};
 
 use clap::Parser;
 
@@ -15,9 +15,13 @@ struct Cli {
     path: std::path::PathBuf, // PathBuff is like a String but for file system path that work cross platform
 }
 
-fn main() -> io::Result<()> {
+#[derive(Debug)]
+struct CustomError (String);
+
+fn main() -> Result<(), CustomError> {
     let args = Cli::parse();
-    let f = File::open(&args.path)?;
+    let f = File::open(&args.path)
+        .map_err(|err| CustomError(format!("Error reading `{:?}`: {}", &args.path, err)))?;
     let reader = BufReader::new(f);
 
     for line in reader.lines() {
@@ -33,5 +37,6 @@ fn main() -> io::Result<()> {
         };
     }
 
+    // The default return value of the function and means “Result is okay, and has no content”
     Ok(())
 }
